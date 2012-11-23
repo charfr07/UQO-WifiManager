@@ -1,6 +1,9 @@
 package com.fcnapps.uqo_wifimanager;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,24 +32,32 @@ import org.apache.http.message.BasicNameValuePair;
 
 public class MainActivity extends Activity {
 	public static final String USER_INFO = "UserInfo";
+	public EditText txtUsername;
+	public EditText txtPassword;
+	public EditText txtMsgSysteme;
+	public TextView lblWifiName;
+	public Button btnLogin;
+	public Button btnRefresh;
+	public Button btnSave;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		final EditText txtUsername = (EditText) findViewById(R.id.txtUsername);
-		final EditText txtPassword = (EditText) findViewById(R.id.txtPassword);
-		final EditText txtMsgSysteme = (EditText) findViewById(R.id.txtMsgSysteme);
-		final TextView lblWifiName = (TextView) findViewById(R.id.lblWifiName);
-		final Button btnLogin = (Button) findViewById(R.id.btnLogin);
-		final Button btnRefresh = (Button) findViewById(R.id.btnRefresh);
-		final Button btnSave = (Button) findViewById(R.id.btnSave);
+		// Retrouver les éléments du GUI de l'activité
+		txtUsername = (EditText) findViewById(R.id.txtUsername);
+		txtPassword = (EditText) findViewById(R.id.txtPassword);
+		txtMsgSysteme = (EditText) findViewById(R.id.txtMsgSysteme);
+		lblWifiName = (TextView) findViewById(R.id.lblWifiName);
+		btnLogin = (Button) findViewById(R.id.btnLogin);
+		btnRefresh = (Button) findViewById(R.id.btnRefresh);
+		btnSave = (Button) findViewById(R.id.btnSave);
 
 		// Permettre de faire une connection sur le thread principal de
-		// l'application
-		// Gelera si la connection echoue...
-		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+		// l'application. TODO: Fix gèle si la connection échoue...
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+				.permitAll().build();
 		StrictMode.setThreadPolicy(policy);
 
 		// Rendre le log de msg système readonly
@@ -59,71 +70,33 @@ public class MainActivity extends Activity {
 		txtUsername.setText(username);
 		txtPassword.setText(password);
 
-		// Détecter le WIFI actuel
-		lblWifiName.setText(getCurrentWifiSSID());
+		// Détecter le WIFI actuel et tenter une connection si nécessaire
+		refreshWifiLbl();
+		if (!isConnected()) {
+			attemptConnection();
+		} else 
+		{
+			logMsgSys("Vous avez déjà accès à l'internet");
+		}
 
-		/*
-		 * Bouton Refresh
-		 */
+		// Bouton Refresh
 		btnRefresh.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				String wifiName = getCurrentWifiSSID();
-				lblWifiName.setText(wifiName);
-
-				txtMsgSysteme.setText(getLogTimeString() + ": refresh; connecté à " + wifiName + "\n\n"
-						+ txtMsgSysteme.getText().toString());
+				refreshWifiLbl();
 			}
 		});
 
-		/*
-		 * Bouton Login
-		 */
+		// Bouton Login
 		btnLogin.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				String username = txtUsername.getText().toString();
-				String password = txtPassword.getText().toString();
-
-				if (getCurrentWifiSSID().equals("\"UQO\"")) {
-					connectUQOWifi(username, password);
-
-					txtMsgSysteme.setText(getLogTimeString() + ": login; tentative de login \n\n"
-							+ txtMsgSysteme.getText().toString());
-				} else {
-					txtMsgSysteme.setText(getLogTimeString()
-							+ ": login; échec, vous devez être sur le réseau \"UQO\"\n\n"
-							+ txtMsgSysteme.getText().toString());
-				}
-
+				attemptConnection();
 			}
 		});
 
-		/*
-		 * Bouton Save
-		 */
+		// Bouton Save
 		btnSave.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
-				// Sauvegarder les informations de l'utilisateur
-				SharedPreferences settings = getSharedPreferences(USER_INFO, 0);
-				SharedPreferences.Editor editor = settings.edit();
-
-				String username = txtUsername.getText().toString();
-				String password = txtPassword.getText().toString();
-
-				editor.putString("username", username);
-				editor.putString("password", password);
-				editor.commit();
-
-				String passwordSemiHidden = "";
-				for (char ch : password.toCharArray()) {
-					if (passwordSemiHidden.length() == 0 || passwordSemiHidden.length() == (password.length() - 1)) {
-						passwordSemiHidden += ch;
-					} else {
-						passwordSemiHidden += "*";
-					}
-				}
-
-				txtMsgSysteme.setText(getLogTimeString() + ": sauvegarde; \n\tUN:" + username + "\n\tPW:"
-						+ passwordSemiHidden + "\n\n" + txtMsgSysteme.getText().toString());
+				saveUserInfo();
 			}
 		});
 	}
@@ -179,5 +152,100 @@ public class MainActivity extends Activity {
 		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
 		Calendar cal = Calendar.getInstance();
 		return sdf.format(cal.getTime());
+	}
+
+	/**
+	 * @param message
+	 */
+	private void logMsgSys(String message) {
+		txtMsgSysteme.setText(getLogTimeString() + ": " + message + "\n\n"
+				+ txtMsgSysteme.getText().toString());
+	}
+
+	/**
+	 * 
+	 */
+	private void refreshWifiLbl() {
+		String wifiName = getCurrentWifiSSID();
+		lblWifiName.setText("Connecté à " + wifiName);
+		logMsgSys("Refresh; connecté à " + wifiName);
+		isConnected();
+	}
+
+	/**
+	 * 
+	 */
+	private void attemptConnection() {
+		String username = txtUsername.getText().toString();
+		String password = txtPassword.getText().toString();
+
+		if (getCurrentWifiSSID().equals("\"UQO\"")
+				|| getCurrentWifiSSID().equals("UQO")) {
+			connectUQOWifi(username, password);
+			
+			if (isConnected())
+			{
+				logMsgSys("Login; Succès!");
+			} else 
+			{
+				logMsgSys("Login; Échec :(");
+			}
+		} else {
+			logMsgSys("Login; Échec, vous devez être sur le réseau \"UQO\"");
+		}
+	}
+
+	/**
+	 * 
+	 */
+	private void saveUserInfo() {
+		// Sauvegarder les informations de l'utilisateur
+		SharedPreferences settings = getSharedPreferences(USER_INFO, 0);
+		SharedPreferences.Editor editor = settings.edit();
+
+		String username = txtUsername.getText().toString();
+		String password = txtPassword.getText().toString();
+
+		editor.putString("username", username);
+		editor.putString("password", password);
+		editor.commit();
+
+		// Généré une variable avec le mot de passe caché sauf
+		// 1er/dernier caractère
+		String partialPwd = "";
+		for (char ch : password.toCharArray()) {
+			if (partialPwd.length() == 0
+					|| partialPwd.length() == (password.length() - 1)) {
+				partialPwd += ch;
+			} else {
+				partialPwd += "*";
+			}
+		}
+
+		logMsgSys("Sauvegarde; \n\tUN:" + username + "\n\tPW:" + partialPwd);
+	}
+
+	/**
+	 * @return
+	 */
+	private boolean isConnected() {
+		try {
+			URL url = new URL("http://www.google.ca");
+			HttpURLConnection urlc = (HttpURLConnection) url.openConnection();
+			urlc.setRequestProperty("User-Agent", "Android Application");
+			urlc.setRequestProperty("Connection", "close");
+			urlc.setConnectTimeout(1000 * 3); // mTimeout is in seconds
+			urlc.connect();
+			if (urlc.getResponseCode() == 200) {
+				return true;
+			}
+		} catch (MalformedURLException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 }
