@@ -29,7 +29,6 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/logoUQO"
         android:gravity="center_horizontal"
-        android:text="@string/nom_du_wifi"
         android:textColor="#000"
         android:textSize="26dp"
         android:textStyle="bold" />
@@ -40,6 +39,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/lblWifiName"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="12dp"
         android:ems="10"
         android:inputType="text" >
 
@@ -69,12 +69,6 @@
             android:text="@string/login" />
 
         <Button
-            android:id="@+id/btnSave"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/sauvegarder" />
-
-        <Button
             android:id="@+id/btnRefresh"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -87,8 +81,11 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/LayoutBtns"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="2dp"
         android:text="@string/messages_systeme"
-        android:textColor="#000" />
+        android:textColor="#000"
+        android:textSize="16dp"
+        android:textStyle="bold" />
 
     <EditText
         android:id="@+id/txtMsgSysteme"
