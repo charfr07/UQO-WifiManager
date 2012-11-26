@@ -6,7 +6,7 @@
     <string name="login">Se connecter</string>
     <string name="messages_systeme">Messages système</string>
     <string name="logo_uqo">Logo UQO</string>
-    <string name="auto_login">Connection automatique</string>
+    <string name="auto_login">Connexion automatique</string>
     <string name="username_hint">Nom d\'usager (ex. abcd01)</string>
     <string name="password_hint">Mot de passe</string>
 
