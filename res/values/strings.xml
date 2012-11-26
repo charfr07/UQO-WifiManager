@@ -3,11 +3,12 @@
     <string name="app_name">UQO-WifiManager</string>
     <string name="menu_settings">Settings</string>
     <string name="title_activity_main">UQO Wifi</string>
-    <string name="refresh">Refresh</string>
-    <string name="login">Login</string>
-    <string name="sauvegarder">Sauvegarder</string>
+    <string name="login">Se connecter</string>
     <string name="messages_systeme">Messages système</string>
     <string name="logo_uqo">Logo UQO</string>
+    <string name="auto_login">Connection automatique</string>
+    <string name="username_hint">Nom d\'usager (ex. abcd01)</string>
+    <string name="password_hint">Mot de passe</string>
 
 
 </resources>
