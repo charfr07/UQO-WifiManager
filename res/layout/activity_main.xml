@@ -1,109 +1,114 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#fff"
-    android:fillViewport="true"
-    android:padding="8dp" >
+    android:background="#fff" >
 
-    <RelativeLayout
+    <ImageView
+        android:id="@+id/logoUQO"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@layout/activity_main"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
+        android:contentDescription="@string/logo_uqo"
+        android:scaleType="fitCenter"
+        android:src="@drawable/logo_uqo" />
 
-        <ImageView
-            android:id="@+id/logoUQO"
+    <TextView
+        android:id="@+id/lblWifiName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/logoUQO"
+        android:gravity="center_horizontal"
+        android:minLines="2"
+        android:textColor="#000"
+        android:textSize="24dp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/txtUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/lblWifiName"
+        android:layout_centerHorizontal="true"
+        android:ems="10"
+        android:hint="@string/username_hint"
+        android:inputType="text"
+        android:minWidth="220dp"
+        android:textSize="16dp" />
+
+    <EditText
+        android:id="@+id/txtPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtUsername"
+        android:layout_centerHorizontal="true"
+        android:ems="10"
+        android:hint="@string/password_hint"
+        android:inputType="textPassword"
+        android:minWidth="220dp"
+        android:textSize="16dp" />
+
+    <TextView
+        android:id="@+id/lblMsgSysteme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/LayoutBtns"
+        android:layout_centerHorizontal="true"
+        android:text="@string/messages_systeme"
+        android:textColor="#000"
+        android:textSize="16dp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:id="@+id/LayoutBtns"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/txtPassword"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_vertical" >
+
+        <Button
+            android:id="@+id/btnLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@layout/activity_main"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="12dp"
-            android:contentDescription="@string/logo_uqo"
-            android:scaleType="fitCenter"
-            android:src="@drawable/logo_uqo" />
+            android:text="@string/login" />
 
-        <TextView
-            android:id="@+id/lblWifiName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/logoUQO"
-            android:gravity="center_horizontal"
-            android:minLines="2"
-            android:textColor="#000"
-            android:textSize="24dp"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/txtUsername"
+        <CheckBox
+            android:id="@+id/chkAutoLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/lblWifiName"
-            android:layout_centerHorizontal="true"
-            android:ems="10"
-            android:hint="@string/username_hint"
-            android:inputType="text"
-            android:minWidth="220dp"
-            android:textSize="16dp" />
+            android:maxWidth="140dp"
+            android:text="@string/auto_login" />
+    </LinearLayout>
 
-        <EditText
-            android:id="@+id/txtPassword"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txtUsername"
-            android:layout_centerHorizontal="true"
-            android:ems="10"
-            android:hint="@string/password_hint"
-            android:inputType="textPassword"
-            android:minWidth="220dp"
-            android:textSize="16dp" />
+    <EditText
+        android:id="@+id/txtMsgSysteme"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/progressBar"
+        android:layout_below="@+id/lblMsgSysteme"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:clickable="false"
+        android:ems="10"
+        android:gravity="center_vertical|top"
+        android:inputType="textMultiLine"
+        android:maxLines="16"
+        android:scrollbarStyle="insideInset"
+        android:textSize="14dp" >
 
-        <TextView
-            android:id="@+id/lblMsgSysteme"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/LayoutBtns"
-            android:layout_centerHorizontal="true"
-            android:text="@string/messages_systeme"
-            android:textColor="#000"
-            android:textSize="16dp"
-            android:textStyle="bold" />
+        <requestFocus />
+    </EditText>
 
-        <LinearLayout
-            android:id="@+id/LayoutBtns"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/txtPassword"
-            android:layout_centerHorizontal="true"
-            android:gravity="center_vertical" >
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="12dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true" />
 
-            <Button
-                android:id="@+id/btnLogin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/login" />
-
-            <CheckBox
-                android:id="@+id/chkAutoLogin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxWidth="140dp"
-                android:text="@string/auto_login" />
-        </LinearLayout>
-
-        <EditText
-            android:id="@+id/txtMsgSysteme"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/lblMsgSysteme"
-            android:clickable="false"
-            android:ems="10"
-            android:gravity="center_vertical|top"
-            android:inputType="textMultiLine"
-            android:maxLines="16"
-            android:scrollbarStyle="insideInset"
-            android:textSize="14dp" >
-
-            <requestFocus />
-        </EditText>
-    </RelativeLayout>
-
-</ScrollView>
+</RelativeLayout>

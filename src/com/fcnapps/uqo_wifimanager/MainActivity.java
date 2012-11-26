@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -30,12 +29,14 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 /**
@@ -52,6 +53,8 @@ public class MainActivity extends Activity {
     public Button              btnLogin;
     private Timer              autoUpdate;
     public Boolean             isConnected = false;
+    public ProgressBar         progressBar;
+    public CountDownTimer      progressBarTimer;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -65,6 +68,7 @@ public class MainActivity extends Activity {
         txtMsgSysteme = (EditText) findViewById(R.id.txtMsgSysteme);
         lblWifiName = (TextView) findViewById(R.id.lblWifiName);
         btnLogin = (Button) findViewById(R.id.btnLogin);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
 
         // Rendre le log de msg système readonly
         txtMsgSysteme.setKeyListener(null);
@@ -85,7 +89,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        // Listener du checkbox Login
+        // Listener du checkbox Auto-Login
         chkAutoLogin.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
             @Override
@@ -95,6 +99,7 @@ public class MainActivity extends Activity {
                 }
                 else {
                     autoUpdate.cancel();
+                    progressBarTimer.cancel();
                 }
             }
         });
@@ -109,6 +114,7 @@ public class MainActivity extends Activity {
     @Override
     public void onPause() {
         autoUpdate.cancel();
+        progressBarTimer.cancel();
         super.onPause();
         saveUserInfo();
     }
@@ -130,10 +136,21 @@ public class MainActivity extends Activity {
             public void run() {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        refreshWifiLbl();
+                        checkConnectionStatus();
                         if (getAutoLogin()) {
                             attemptConnection();
                         }
+
+                        progressBarTimer = new CountDownTimer(10000, 200) {
+                            public void onTick(long millisUntilFinished) {
+                                progressBar.incrementProgressBy(1);
+                                int dtotal = (int) ((10200 - millisUntilFinished) / (double) 10000 * 100);
+                                progressBar.setProgress(dtotal);
+                            }
+
+                            public void onFinish() {
+                            }
+                        }.start();
                     }
                 });
             }
@@ -150,7 +167,7 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * Raffraichit le libellé du statut de la connection wifi et le status de la
+     * Raffraichit le libellé du statut de la connexion wifi et le status de la
      * connectivité internet si le wifi est actif
      */
     private void refreshWifiLbl() {
@@ -160,7 +177,15 @@ public class MainActivity extends Activity {
         if (wifi == State.CONNECTED) {
             String wifiName = getWifiSSID();
             lblWifiName.setText("Connecté à " + wifiName);
-            checkConnectionStatus();
+
+            if (isConnected) {
+                lblWifiName.setTextColor(Color.rgb(130, 180, 100));
+                lblWifiName.append("\n avec accès internet");
+            }
+            else {
+                lblWifiName.setTextColor(Color.rgb(255, 200, 0));
+                lblWifiName.append("\n sans accès internet");
+            }
         }
         else {
             lblWifiName.setTextColor(Color.rgb(200, 0, 0));
@@ -169,25 +194,22 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * Tentera une connection au réseau sans-fil "UQO"
+     * Tentera une connexion au réseau sans-fil "UQO"
      */
     private void attemptConnection() {
         if (getWifiSSID().equals("\"UQO\"") || getWifiSSID().equals("UQO")) {
             if (getUsername().isEmpty() || getPassword().isEmpty()) {
-                logMsgSys("La tentative de connection ne sera pas faite. Vous devez spécifier votre nom d'usager et mot de passe");
+                logMsgSys("La tentative de connexion ne sera pas faite. Vous devez spécifier votre nom d'usager et mot de passe");
             }
             else {
-                if (isConnected) {
-                    logMsgSys("La tentative de connection ne sera pas faite. Vous être sur le réseau \"UQO\" et avez déjà accès à l'internet");
-                }
-                else {
+                if (!isConnected) {
                     connectUQOWifiTask task = new connectUQOWifiTask();
                     task.execute(new Void[] {});
                 }
             }
         }
         else {
-            logMsgSys("La tentative de connection ne sera pas faite. Vous devez être sur le réseau \"UQO\"");
+            logMsgSys("La tentative de connexion ne sera pas faite. Vous devez être sur le réseau \"UQO\"");
         }
     }
 
@@ -292,15 +314,12 @@ public class MainActivity extends Activity {
         @Override
         protected void onPostExecute(Boolean result) {
             if (!result) {
-                lblWifiName.setTextColor(Color.rgb(255, 200, 0));
-                lblWifiName.append("\n sans accès internet");
                 isConnected = false;
             }
             else {
-                lblWifiName.setTextColor(Color.rgb(130, 180, 100));
-                lblWifiName.append("\n avec accès internet");
                 isConnected = true;
             }
+            refreshWifiLbl();
         }
     }
 
@@ -324,7 +343,8 @@ public class MainActivity extends Activity {
                 httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
                 // Faire le POST
-                HttpResponse response = httpclient.execute(httppost);
+                // HttpResponse response = httpclient.execute(httppost);
+                httpclient.execute(httppost);
             }
             catch (ClientProtocolException e) {
 
