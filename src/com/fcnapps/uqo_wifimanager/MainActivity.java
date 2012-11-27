@@ -181,6 +181,10 @@ public class MainActivity extends Activity {
             if (isConnected) {
                 lblWifiName.setTextColor(Color.rgb(130, 180, 100));
                 lblWifiName.append("\n avec accès internet");
+
+                if (wifiName.equals("UQO") || wifiName.equals("\"UQO\"")) {
+                    logMsgSys("Vous êtes déjà connecté au réseau UQO. Vous pouvez quitter l'application");
+                }
             }
             else {
                 lblWifiName.setTextColor(Color.rgb(255, 200, 0));
@@ -205,6 +209,9 @@ public class MainActivity extends Activity {
                 if (!isConnected) {
                     connectUQOWifiTask task = new connectUQOWifiTask();
                     task.execute(new Void[] {});
+                }
+                else {
+                    logMsgSys("Vous êtes déjà connecté au réseau UQO. Vous pouvez quitter l'application");
                 }
             }
         }
