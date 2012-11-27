@@ -163,7 +163,7 @@ public class MainActivity extends Activity {
      * @param message
      */
     private void logMsgSys(String message) {
-        txtMsgSysteme.setText(getLogTimeString() + ": " + message + "\n" + txtMsgSysteme.getText().toString());
+        txtMsgSysteme.setText(getLogTimeString() + ": " + message);
     }
 
     /**
@@ -199,7 +199,7 @@ public class MainActivity extends Activity {
     private void attemptConnection() {
         if (getWifiSSID().equals("\"UQO\"") || getWifiSSID().equals("UQO")) {
             if (getUsername().isEmpty() || getPassword().isEmpty()) {
-                logMsgSys("La tentative de connexion ne sera pas faite. Vous devez spécifier votre nom d'usager et mot de passe");
+                logMsgSys("La tentative de connexion n'a pas été effectuée. Vous devez spécifier votre nom d'usager et mot de passe");
             }
             else {
                 if (!isConnected) {
@@ -209,7 +209,7 @@ public class MainActivity extends Activity {
             }
         }
         else {
-            logMsgSys("La tentative de connexion ne sera pas faite. Vous devez être sur le réseau \"UQO\"");
+            logMsgSys("La tentative de connexion n'a pas été effectuée. Vous devez être sur le réseau \"UQO\"");
         }
     }
 
@@ -256,7 +256,7 @@ public class MainActivity extends Activity {
      * @return HH:mm:ss.SSS
      */
     private String getLogTimeString() {
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss.SSS");
+        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
         Calendar cal = Calendar.getInstance();
         return sdf.format(cal.getTime());
     }

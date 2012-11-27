@@ -9,6 +9,7 @@
     <string name="auto_login">Connexion automatique</string>
     <string name="username_hint">Nom d\'usager (ex. abcd01)</string>
     <string name="password_hint">Mot de passe</string>
+    <string name="prochaine_tentative">Prochaine tentative de connexion</string>
 
 
 </resources>

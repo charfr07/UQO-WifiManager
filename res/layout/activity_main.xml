@@ -48,7 +48,8 @@
         android:hint="@string/password_hint"
         android:inputType="textPassword"
         android:minWidth="220dp"
-        android:textSize="16dp" />
+        android:textSize="16dp"
+        android:typeface="normal" />
 
     <TextView
         android:id="@+id/lblMsgSysteme"
@@ -87,7 +88,7 @@
         android:id="@+id/txtMsgSysteme"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/progressBar"
+        android:layout_above="@+id/lblNextTry"
         android:layout_below="@+id/lblMsgSysteme"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
@@ -95,9 +96,8 @@
         android:ems="10"
         android:gravity="center_vertical|top"
         android:inputType="textMultiLine"
-        android:maxLines="16"
         android:scrollbarStyle="insideInset"
-        android:textSize="14dp" >
+        android:textSize="16dp" >
 
         <requestFocus />
     </EditText>
@@ -110,5 +110,18 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true" />
+
+    <TextView
+        android:id="@+id/lblNextTry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/progressBar"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:text="@string/prochaine_tentative"
+        android:textSize="16dp"
+        android:textStyle="italic" />
 
 </RelativeLayout>
