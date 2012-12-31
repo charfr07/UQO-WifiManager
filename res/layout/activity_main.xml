@@ -1,6 +1,11 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ScrollView01"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_height="fill_parent" >
+    
+    <RelativeLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
     android:background="#fff" >
 
     <ImageView
@@ -23,7 +28,7 @@
         android:gravity="center_horizontal"
         android:minLines="2"
         android:textColor="#000"
-        android:textSize="24dp"
+        android:textSize="24sp"
         android:textStyle="bold" />
 
     <EditText
@@ -36,7 +41,7 @@
         android:hint="@string/username_hint"
         android:inputType="text"
         android:minWidth="220dp"
-        android:textSize="16dp" />
+        android:textSize="16sp" />
 
     <EditText
         android:id="@+id/txtPassword"
@@ -48,19 +53,8 @@
         android:hint="@string/password_hint"
         android:inputType="textPassword"
         android:minWidth="220dp"
-        android:textSize="16dp"
+        android:textSize="16sp"
         android:typeface="normal" />
-
-    <TextView
-        android:id="@+id/lblMsgSysteme"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/LayoutBtns"
-        android:layout_centerHorizontal="true"
-        android:text="@string/messages_systeme"
-        android:textColor="#000"
-        android:textSize="16dp"
-        android:textStyle="bold" />
 
     <LinearLayout
         android:id="@+id/LayoutBtns"
@@ -75,53 +69,31 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/login" />
-
-        <CheckBox
-            android:id="@+id/chkAutoLogin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:maxWidth="140dp"
-            android:text="@string/auto_login" />
     </LinearLayout>
 
-    <EditText
-        android:id="@+id/txtMsgSysteme"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/lblNextTry"
-        android:layout_below="@+id/lblMsgSysteme"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
-        android:clickable="false"
-        android:ems="10"
-        android:gravity="center_vertical|top"
-        android:inputType="textMultiLine"
-        android:scrollbarStyle="insideInset"
-        android:textSize="16dp" >
-
-        <requestFocus />
-    </EditText>
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="12dp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true" />
-
     <TextView
-        android:id="@+id/lblNextTry"
+        android:id="@+id/txtApropos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/progressBar"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:text="@string/prochaine_tentative"
-        android:textSize="16dp"
-        android:textStyle="italic" />
+        android:layout_below="@+id/LayoutBtns"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/A_propos"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/txtAproposParagraph"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/txtApropos"
+        android:layout_alignRight="@+id/txtApropos"
+        android:layout_below="@+id/txtApropos"
+        android:text="@string/A_propos_paragraph" />
+
 
 </RelativeLayout>
+</ScrollView>
