@@ -8,12 +8,13 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 /**
  * @author Francois Charette Nguyen
@@ -24,7 +25,6 @@ public class MainActivity extends Activity {
 	// GUI
 	private EditText txtUsername;
 	private EditText txtPassword;
-	private TextView lblWifiName;
 	private Button btnLogin;
 	// Background stuff
 	private Long lastConnectionAttempt = Long.MIN_VALUE;
@@ -32,7 +32,7 @@ public class MainActivity extends Activity {
 	private BackgroundService mBackgroundService;
 	private ServiceConnection mConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName className, IBinder service) {
-			mBackgroundService = ((BackgroundService.MyBinder) service).getService();
+			mBackgroundService = ((BackgroundService.LocalBinder) service).getService();
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
@@ -61,20 +61,45 @@ public class MainActivity extends Activity {
 		// Retrouver les éléments du GUI de l'activité
 		txtUsername = (EditText) findViewById(R.id.txtUsername);
 		txtPassword = (EditText) findViewById(R.id.txtPassword);
-		lblWifiName = (TextView) findViewById(R.id.lblWifiName);
 		btnLogin = (Button) findViewById(R.id.btnLogin);
 
 		// Charger les informations sauvegardées
 		loadUserInfo();
 
-		// Listener du bouton Login
+		// OnClick du bouton authentifier
 		btnLogin.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				// Empecher de spammer l'action à intervalle < 5 secondes
 				if (lastConnectionAttempt + 5000 < System.currentTimeMillis()) {
-					mBackgroundService.attemptConnection();
+					mBackgroundService.attemptAuthentification();
 					lastConnectionAttempt = System.currentTimeMillis();
 				}
+			}
+		});
+
+		// OnChange du champs username
+		txtUsername.addTextChangedListener(new TextWatcher() {
+			public void afterTextChanged(Editable s) {
+				saveUserInfo();
+			}
+
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			}
+
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			}
+		});
+
+		// OnChange du champs password
+		txtPassword.addTextChangedListener(new TextWatcher() {
+			public void afterTextChanged(Editable s) {
+				saveUserInfo();
+			}
+
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			}
+
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
 			}
 		});
 	}
@@ -123,26 +148,8 @@ public class MainActivity extends Activity {
 		SharedPreferences settings = getSharedPreferences(USER_INFO, 0);
 		SharedPreferences.Editor editor = settings.edit();
 
-		editor.putString("username", getUsername());
-		editor.putString("password", getPassword());
+		editor.putString("username", txtUsername.getText().toString());
+		editor.putString("password", txtPassword.getText().toString());
 		editor.commit();
-	}
-
-	/**
-	 * Retourne le password contenu dans le EditText correspondant
-	 * 
-	 * @return
-	 */
-	private String getPassword() {
-		return txtPassword.getText().toString();
-	}
-
-	/**
-	 * Retourne le username contenu dans le EditText correspondant
-	 * 
-	 * @return
-	 */
-	private String getUsername() {
-		return txtUsername.getText().toString();
 	}
 }
