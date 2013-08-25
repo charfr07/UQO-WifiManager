@@ -8,12 +8,21 @@
     <string name="username_hint">Nom d\'usager (ex. abcd01)</string>
     <string name="password_hint">Mot de passe</string>
     <string name="A_propos">À propos</string>
-    <string name="A_propos_paragraph">Cette application sert à vous authentifier lorsque votre appareil 
-        mobile se connecte au réseau sans-fil de l\'UQO. À la première utilisation vous devez entrer vos informations 
-        et utiliser le bouton \"S\'authentifier\". L\'application se rappelera de vos informations et vous authentifiera 
-        chaque fois que votre appareil se reconnectera au réseau sans-fil "UQO" (même lorsque l\'application n\'est pas visible). 
-        Si jamais vous changez de mot de passe ou si l\'authentification automatique échoue, vous pouvez ajuster vos 
-        informations et vous authentifier manuellement avec le bouton à cet effet. 
+    <string name="A_propos_paragraph">Cette application sert à vous authentifier lorsque votre
+        appareil mobile se connecte au réseau sans-fil de l\'UQO. À la première utilisation vous
+        devez entrer vos informations et utiliser le bouton \"S\'authentifier\". L\'application se
+        rappelera de vos informations et vous authentifiera chaque fois que votre appareil se
+        reconnectera au réseau sans-fil "UQO" (même lorsque l\'application n\'est pas visible). Si
+        jamais vous changez de mot de passe ou si l\'authentification automatique échoue, vous
+        pouvez ajuster vos informations et vous authentifier manuellement avec le bouton à cet
+        effet.
+    </string>
+    <string name="failed_login">L\'authentification au r�seau sans-fil UQO semble avoir �chou�
+    </string>
+    <string name="success_login">L\'authentification au réseau sans-fil UQO est réussie</string>
+    <string name="WifiPasUQO">Vous n\'êtes pas connecté au réseau sans-fil de l\'UQO</string>
+    <string name="UsrPwNonSpecifie">Gestionnaire de connexion sans-fil UQO: vous devez spécifier
+        votre nom d\'usager et mot de passe
     </string>
 
 </resources>

@@ -18,9 +18,9 @@ import android.widget.EditText;
 
 /**
  * @author Francois Charette Nguyen
- * 
  */
-public class MainActivity extends Activity {
+public class MainActivity extends Activity
+{
 	private static final String USER_INFO = "UserInfo";
 	// GUI
 	private EditText txtUsername;
@@ -30,47 +30,57 @@ public class MainActivity extends Activity {
 	private Long lastConnectionAttempt = Long.MIN_VALUE;
 	private Boolean mIsBound;
 	private BackgroundService mBackgroundService;
-	private ServiceConnection mConnection = new ServiceConnection() {
-		public void onServiceConnected(ComponentName className, IBinder service) {
+	private ServiceConnection mConnection = new ServiceConnection()
+	{
+		public void onServiceConnected(ComponentName className, IBinder service)
+		{
 			mBackgroundService = ((BackgroundService.LocalBinder) service).getService();
 		}
 
-		public void onServiceDisconnected(ComponentName className) {
+		public void onServiceDisconnected(ComponentName className)
+		{
 			mBackgroundService = null;
 		}
 	};
 
-	private void doBindService() {
+	private void doBindService()
+	{
 		bindService(new Intent(getApplicationContext(), BackgroundService.class), mConnection, Context.BIND_AUTO_CREATE);
 		mIsBound = true;
 	}
 
-	private void doUnbindService() {
-		if (mIsBound) {
+	private void doUnbindService()
+	{
+		if (mIsBound)
+		{
 			unbindService(mConnection);
 			mIsBound = false;
 		}
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState)
+	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-		// Retrouver les éléments du GUI de l'activité
+		// Retrouver les Ã©lÃ©ments du GUI de l'activitÃ©
 		txtUsername = (EditText) findViewById(R.id.txtUsername);
 		txtPassword = (EditText) findViewById(R.id.txtPassword);
 		btnLogin = (Button) findViewById(R.id.btnLogin);
 
-		// Charger les informations sauvegardées
+		// Charger les informations sauvegardÃ©es
 		loadUserInfo();
 
 		// OnClick du bouton authentifier
-		btnLogin.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				// Empecher de spammer l'action à intervalle < 5 secondes
-				if (lastConnectionAttempt + 5000 < System.currentTimeMillis()) {
+		btnLogin.setOnClickListener(new View.OnClickListener()
+		{
+			public void onClick(View v)
+			{
+				// EmpÃ©cher de spammer l'action Ã  intervalle < 5 secondes
+				if (lastConnectionAttempt + 5000 < System.currentTimeMillis())
+				{
 					mBackgroundService.attemptAuthentification();
 					lastConnectionAttempt = System.currentTimeMillis();
 				}
@@ -78,34 +88,43 @@ public class MainActivity extends Activity {
 		});
 
 		// OnChange du champs username
-		txtUsername.addTextChangedListener(new TextWatcher() {
-			public void afterTextChanged(Editable s) {
+		txtUsername.addTextChangedListener(new TextWatcher()
+		{
+			public void afterTextChanged(Editable s)
+			{
 				saveUserInfo();
 			}
 
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			public void beforeTextChanged(CharSequence s, int start, int count, int after)
+			{
 			}
 
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			public void onTextChanged(CharSequence s, int start, int before, int count)
+			{
 			}
 		});
 
 		// OnChange du champs password
-		txtPassword.addTextChangedListener(new TextWatcher() {
-			public void afterTextChanged(Editable s) {
+		txtPassword.addTextChangedListener(new TextWatcher()
+		{
+			public void afterTextChanged(Editable s)
+			{
 				saveUserInfo();
 			}
 
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			public void beforeTextChanged(CharSequence s, int start, int count, int after)
+			{
 			}
 
-			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			public void onTextChanged(CharSequence s, int start, int before, int count)
+			{
 			}
 		});
 	}
 
 	@Override
-	public void onResume() {
+	public void onResume()
+	{
 		super.onResume();
 		Intent service = new Intent(getBaseContext(), BackgroundService.class);
 		getBaseContext().startService(service);
@@ -113,19 +132,22 @@ public class MainActivity extends Activity {
 	}
 
 	@Override
-	public void onPause() {
+	public void onPause()
+	{
 		super.onPause();
 		saveUserInfo();
 	}
 
 	@Override
-	public void onDestroy() {
+	public void onDestroy()
+	{
 		super.onDestroy();
 		doUnbindService();
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
 		getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;
 	}
@@ -133,7 +155,8 @@ public class MainActivity extends Activity {
 	/**
 	 * Charge le username + password de l'utilisateur
 	 */
-	private void loadUserInfo() {
+	private void loadUserInfo()
+	{
 		SharedPreferences settings = getSharedPreferences(USER_INFO, 0);
 		String username = settings.getString("username", "");
 		String password = settings.getString("password", "");
@@ -144,7 +167,8 @@ public class MainActivity extends Activity {
 	/**
 	 * Sauvegarde le username + password de l'utilisateur
 	 */
-	private void saveUserInfo() {
+	private void saveUserInfo()
+	{
 		SharedPreferences settings = getSharedPreferences(USER_INFO, 0);
 		SharedPreferences.Editor editor = settings.edit();
 
