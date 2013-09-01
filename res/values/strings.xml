@@ -17,7 +17,7 @@
         pouvez ajuster vos informations et vous authentifier manuellement avec le bouton à cet
         effet.
     </string>
-    <string name="failed_login">L\'authentification au r�seau sans-fil UQO semble avoir �chou�
+    <string name="failed_login">L\'authentification au réseau sans-fil UQO semble avoir échoué
     </string>
     <string name="success_login">L\'authentification au réseau sans-fil UQO est réussie</string>
     <string name="WifiPasUQO">Vous n\'êtes pas connecté au réseau sans-fil de l\'UQO</string>

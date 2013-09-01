@@ -36,18 +36,21 @@ public class BackgroundService extends Service
 	// This is the object that receives interactions from clients. See
 	// RemoteService for a more complete example.
 	private final IBinder mBinder = new LocalBinder();
-	public Boolean isConnected = false;
-	private BroadcastReceiver mConnReceiver = new BroadcastReceiver()
+	private Boolean isConnected = false;
+	private final BroadcastReceiver mConnReceiver = new BroadcastReceiver()
 	{
 		public void onReceive(Context context, Intent intent)
 		{
-			NetworkInfo currentNetworkInfo = intent
-					.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-
-			// Si l'événement reçu est une connexion établie et que c'est le réseau sans-fil UQO, s'authentifier
-			if (currentNetworkInfo.isConnected() && (getWifiSSID().equals("\"UQO\"") || getWifiSSID().equals("UQO")))
+			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+			if (cm != null)
 			{
-				attemptAuthentification();
+				NetworkInfo ni = cm.getActiveNetworkInfo();
+
+				// Si l'événement reçu est une connexion établie et que c'est le réseau sans-fil UQO, s'authentifier
+				if (ni.isConnected() && (getWifiSSID().equals("\"UQO\"") || getWifiSSID().equals("UQO")))
+				{
+					attemptAuthentification();
+				}
 			}
 		}
 	};
