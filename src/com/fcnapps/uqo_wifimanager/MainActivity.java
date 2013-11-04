@@ -6,7 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,6 +18,13 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * @author Francois Charette Nguyen
@@ -22,12 +32,15 @@ import android.widget.EditText;
 public class MainActivity extends Activity
 {
 	private static final String USER_INFO = "UserInfo";
+	private static boolean haveWebAcces = false;
+
 	// GUI
 	private EditText txtUsername;
 	private EditText txtPassword;
+	private TextView lblConnectionStatus;
 	private Button btnLogin;
+	private ProgressBar progressBar;
 	// Background stuff
-	private Long lastConnectionAttempt = Long.MIN_VALUE;
 	private Boolean mIsBound;
 	private BackgroundService mBackgroundService;
 	private ServiceConnection mConnection = new ServiceConnection()
@@ -43,12 +56,14 @@ public class MainActivity extends Activity
 		}
 	};
 
+	// Se lie au service en arrière plan
 	private void doBindService()
 	{
 		bindService(new Intent(getApplicationContext(), BackgroundService.class), mConnection, Context.BIND_AUTO_CREATE);
 		mIsBound = true;
 	}
 
+	// Se délie du service en arrière plan
 	private void doUnbindService()
 	{
 		if (mIsBound)
@@ -68,7 +83,10 @@ public class MainActivity extends Activity
 		// Retrouver les éléments du GUI de l'activité
 		txtUsername = (EditText) findViewById(R.id.txtUsername);
 		txtPassword = (EditText) findViewById(R.id.txtPassword);
+		lblConnectionStatus = (TextView) findViewById(R.id.lblConnectionStatus);
 		btnLogin = (Button) findViewById(R.id.btnLogin);
+		progressBar = (ProgressBar) findViewById(R.id.progressBar);
+		progressBar.setVisibility(View.INVISIBLE);
 
 		// Charger les informations sauvegardées
 		loadUserInfo();
@@ -79,11 +97,9 @@ public class MainActivity extends Activity
 			public void onClick(View v)
 			{
 				// Empécher de spammer l'action à intervalle < 5 secondes
-				if (lastConnectionAttempt + 5000 < System.currentTimeMillis())
-				{
-					mBackgroundService.attemptAuthentification();
-					lastConnectionAttempt = System.currentTimeMillis();
-				}
+				mBackgroundService.attemptAuthentification();
+				lockLoginButton(3000);
+				checkWebAccess();
 			}
 		});
 
@@ -122,6 +138,56 @@ public class MainActivity extends Activity
 		});
 	}
 
+	private void lockLoginButton(final int duration)
+	{
+		// Afficher la barre d'attente pour la durée spécifiée
+		btnLogin.setEnabled(false);
+		progressBar.setVisibility(View.VISIBLE);
+
+		new CountDownTimer(duration + 51, duration / 100)
+		{
+			int percent = 0;
+
+			public void onTick(long millisUntilFinished)
+			{
+				percent += 1;
+				progressBar.setProgress(percent);
+			}
+
+			public void onFinish()
+			{
+				progressBar.setVisibility(View.INVISIBLE);
+			}
+		}.start();
+
+		// Désactiver le bouton pour la durée spécifiée
+		new Thread(new Runnable()
+		{
+
+			@Override
+			public void run()
+			{
+				try
+				{
+					Thread.sleep(duration);
+				} catch (InterruptedException e)
+				{
+					e.printStackTrace();
+				}
+
+				MainActivity.this.runOnUiThread(new Runnable()
+				{
+
+					@Override
+					public void run()
+					{
+						btnLogin.setEnabled(true);
+					}
+				});
+			}
+		}).start();
+	}
+
 	@Override
 	public void onResume()
 	{
@@ -129,6 +195,14 @@ public class MainActivity extends Activity
 		Intent service = new Intent(getBaseContext(), BackgroundService.class);
 		getBaseContext().startService(service);
 		doBindService();
+
+		checkWebAccess();
+	}
+
+	private void checkWebAccess()
+	{
+		PingWebpageTask task = new PingWebpageTask();
+		task.execute("http://www.google.ca");
 	}
 
 	@Override
@@ -175,5 +249,66 @@ public class MainActivity extends Activity
 		editor.putString("username", txtUsername.getText().toString());
 		editor.putString("password", txtPassword.getText().toString());
 		editor.commit();
+	}
+
+
+	/**
+	 * Tâche asynchrone qui essaie une connexion vers un URL
+	 */
+	private class PingWebpageTask extends AsyncTask<String, Void, Boolean>
+	{
+		@Override
+		protected Boolean doInBackground(String... urls)
+		{
+			try
+			{
+				URL url = new URL(urls[0]);
+				HttpURLConnection urlc = (HttpURLConnection) url.openConnection();
+				urlc.setRequestProperty("User-Agent", "Android Application");
+				urlc.setRequestProperty("Connection", "close");
+				urlc.setConnectTimeout(1000 * 5); // Abandonner après 5 secondes
+				urlc.connect();
+				if (urlc.getResponseCode() == 200)
+				{
+					return true;
+				}
+			} catch (MalformedURLException ignored)
+			{
+
+			} catch (IOException ignored)
+			{
+
+			}
+			return false;
+		}
+
+		@Override
+		protected void onPostExecute(Boolean result)
+		{
+			haveWebAcces = result;
+			updateLblConnectionStatus();
+		}
+	}
+
+	private void updateLblConnectionStatus()
+	{
+		if (haveWebAcces)
+		{
+			if (mBackgroundService.connectedToUQO())
+			{
+				lblConnectionStatus.setText("Vous avez accès à l'internet via le réseau UQO");
+				lblConnectionStatus.setTextColor(Color.parseColor("#55AA55"));
+			}
+			else
+			{
+				lblConnectionStatus.setText("Vous avez accès à l'internet via le réseau " + mBackgroundService.getWifiSSID());
+				lblConnectionStatus.setTextColor(Color.parseColor("#000000"));
+			}
+		}
+		else
+		{
+			lblConnectionStatus.setText("Vous n'avez pas accès à l'internet");
+			lblConnectionStatus.setTextColor(Color.parseColor("#FF5555"));
+		}
 	}
 }

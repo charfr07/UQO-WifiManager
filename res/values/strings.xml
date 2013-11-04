@@ -24,5 +24,7 @@
     <string name="UsrPwNonSpecifie">Gestionnaire de connexion sans-fil UQO: vous devez spécifier
         votre nom d\'usager et mot de passe
     </string>
+    <string name="DejaAccesInternet">Vous avez déjà accès à l\'internet</string>
+    <string name="lblConnectionStatus">Status de la connectivité</string>
 
 </resources>

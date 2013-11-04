@@ -24,15 +24,15 @@
         android:id="@+id/txtUsername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/logoUQO"
-        android:layout_centerHorizontal="true"
         android:ems="10"
         android:hint="@string/username_hint"
         android:inputType="textFilter"
         android:minWidth="220dp"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:layout_below="@+id/lblConnectionStatus"
+        android:layout_alignLeft="@+id/txtPassword"/>
 
-    <EditText
+        <EditText
         android:id="@+id/txtPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -53,15 +53,32 @@
         android:layout_centerHorizontal="true"
         android:gravity="center_vertical" >
 
-        <Button
-            android:id="@+id/btnLogin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/login" />
+        <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+
+            <Button
+                    android:id="@+id/btnLogin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/login"/>
+
+            <ProgressBar
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/progressBar"
+                    android:layout_alignBottom="@+id/txtPassword"
+                    android:layout_centerHorizontal="true"
+                    android:maxHeight="3dp"
+                    android:minHeight="3dp"/>
+        </LinearLayout>
+
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/txtApropos"
+        <TextView
+                android:id="@+id/txtApropos"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
@@ -83,6 +100,17 @@
         android:layout_below="@+id/txtApropos"
         android:text="@string/A_propos_paragraph" />
 
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/lblConnectionStatus"
+                android:id="@+id/lblConnectionStatus"
+                android:gravity="center_horizontal"
+                android:layout_below="@+id/logoUQO"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="10dp"/>
 
-</RelativeLayout>
+
+    </RelativeLayout>
 </ScrollView>

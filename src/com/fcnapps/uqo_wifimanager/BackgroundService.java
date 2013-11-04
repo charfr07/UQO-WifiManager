@@ -32,37 +32,46 @@ import java.util.List;
 
 public class BackgroundService extends Service
 {
-	private static final String USER_INFO = "UserInfo";
-	// This is the object that receives interactions from clients. See
-	// RemoteService for a more complete example.
-	private final IBinder mBinder = new LocalBinder();
 	private Boolean isConnected = false;
+	private static final String USER_INFO = "UserInfo";
+	private final IBinder mBinder = new LocalBinder();
+
 	private final BroadcastReceiver mConnReceiver = new BroadcastReceiver()
 	{
 		public void onReceive(Context context, Intent intent)
 		{
-			ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-			if (cm != null)
+			// Si l'événement reçu est une connexion établie et que c'est le réseau sans-fil UQO, s'authentifier
+			if (connectionExists() && connectedToUQO())
 			{
-				NetworkInfo ni = cm.getActiveNetworkInfo();
-
-				// Si l'événement reçu est une connexion établie et que c'est le réseau sans-fil UQO, s'authentifier
-				if (ni.isConnected() && (getWifiSSID().equals("\"UQO\"") || getWifiSSID().equals("UQO")))
-				{
-					attemptAuthentification();
-				}
+				attemptAuthentification();
 			}
 		}
 	};
+
+	private boolean connectionExists()
+	{
+		ConnectivityManager cm = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+		if (cm != null)
+		{
+			NetworkInfo ni = cm.getActiveNetworkInfo();
+			if (ni != null)
+			{
+				return ni.isConnected();
+			}
+		}
+		return false;
+	}
 
 	// Lorsque le service démarre, commencer à monitorer l'état de la connection
 	@Override
 	public void onCreate()
 	{
+		super.onCreate();
 		this.registerReceiver(this.mConnReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+		checkConnectionStatus();
 	}
 
-	// Garder le service actif sauf si explicitement demand� de le fermer
+	// Garder le service actif sauf si explicitement demandé de le fermer
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId)
 	{
@@ -91,7 +100,7 @@ public class BackgroundService extends Service
 	 */
 	public void attemptAuthentification()
 	{
-		if (getWifiSSID().equals("\"UQO\"") || getWifiSSID().equals("UQO"))
+		if (connectedToUQO())
 		{
 			if (getUsername().isEmpty() || getPassword().isEmpty())
 			{
@@ -99,8 +108,8 @@ public class BackgroundService extends Service
 			}
 			else if (!isConnected)
 			{
-				connectUQOWifiTask task = new connectUQOWifiTask();
-				task.execute(new Void[]{});
+				taskAuthentifyToUQONetwork task = new taskAuthentifyToUQONetwork();
+				task.execute();
 			}
 		}
 		else
@@ -109,13 +118,18 @@ public class BackgroundService extends Service
 		}
 	}
 
+	public boolean connectedToUQO()
+	{
+		return getWifiSSID().equals("\"UQO\"") || getWifiSSID().equals("UQO");
+	}
+
 	/**
 	 * Retourne une string avec le nom du réseau sans fil sur lequel l'appareil
 	 * est connecté (SSID)
 	 *
 	 * @return SSID
 	 */
-	private String getWifiSSID()
+	public String getWifiSSID()
 	{
 		WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
 		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
@@ -189,17 +203,20 @@ public class BackgroundService extends Service
 		@Override
 		protected void onPostExecute(Boolean result)
 		{
-			if (!result)
+			if (connectedToUQO())
 			{
-				isConnected = false;
-				Toast.makeText(getApplicationContext(),
-						getString(R.string.failed_login), Toast.LENGTH_SHORT).show();
-			}
-			else
-			{
-				isConnected = true;
-				Toast.makeText(getApplicationContext(), getString(R.string.success_login),
-						Toast.LENGTH_SHORT).show();
+				if (!result)
+				{
+					isConnected = false;
+					Toast.makeText(getApplicationContext(),
+							getString(R.string.failed_login), Toast.LENGTH_SHORT).show();
+				}
+				else
+				{
+					isConnected = true;
+					Toast.makeText(getApplicationContext(), getString(R.string.success_login),
+							Toast.LENGTH_SHORT).show();
+				}
 			}
 		}
 	}
@@ -208,7 +225,7 @@ public class BackgroundService extends Service
 	 * Tâche asynchrone qui tentera de soumettre les informations de login de
 	 * l'utilisateur à la page d'authentification
 	 */
-	private class connectUQOWifiTask extends AsyncTask<Void, Void, Void>
+	private class taskAuthentifyToUQONetwork extends AsyncTask<Void, Void, Void>
 	{
 		@Override
 		protected Void doInBackground(Void... _void)
@@ -220,7 +237,7 @@ public class BackgroundService extends Service
 
 			try
 			{
-				// Données à envoyer
+				// Données à envoyer (user+password)
 				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
 				nameValuePairs.add(new BasicNameValuePair("user", getUsername()));
 				nameValuePairs.add(new BasicNameValuePair("password", getPassword()));
@@ -244,5 +261,4 @@ public class BackgroundService extends Service
 			checkConnectionStatus();
 		}
 	}
-
 }
