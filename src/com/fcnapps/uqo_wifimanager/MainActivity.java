@@ -13,6 +13,7 @@ import android.os.CountDownTimer;
 import android.os.IBinder;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.WindowManager;
@@ -31,7 +32,8 @@ import java.net.URL;
  */
 public class MainActivity extends Activity
 {
-	private static final String USER_INFO = "UserInfo";
+    private static final String TAG = "UQO-WifiManager-GUI";
+    private static final String USER_INFO = "UserInfo";
 	private static boolean haveWebAcces = false;
 
 	// GUI
@@ -76,7 +78,8 @@ public class MainActivity extends Activity
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
-		super.onCreate(savedInstanceState);
+		Log.d(TAG, "Application démarrée (onCreate)");
+        super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
@@ -96,10 +99,10 @@ public class MainActivity extends Activity
 		{
 			public void onClick(View v)
 			{
-				// Empécher de spammer l'action à intervalle < 5 secondes
-				mBackgroundService.attemptAuthentification();
-				lockLoginButton(3000);
-				checkWebAccess();
+            // Empécher de spammer l'action à intervalle < 5 secondes
+            mBackgroundService.attemptAuthentification();
+            lockLoginButton(3000);
+            checkWebAccess();
 			}
 		});
 
@@ -191,12 +194,15 @@ public class MainActivity extends Activity
 	@Override
 	public void onResume()
 	{
-		super.onResume();
-		Intent service = new Intent(getBaseContext(), BackgroundService.class);
-		getBaseContext().startService(service);
-		doBindService();
+        Log.d(TAG, "Application en focus (onResume)");
 
-		checkWebAccess();
+        super.onResume();
+
+        stopService(new Intent(this, BackgroundService.class));
+        startService(new Intent(this, BackgroundService.class));
+        doBindService();
+
+        checkWebAccess();
 	}
 
 	private void checkWebAccess()
@@ -208,14 +214,16 @@ public class MainActivity extends Activity
 	@Override
 	public void onPause()
 	{
-		super.onPause();
+        Log.d(TAG, "Application perdu focus (onPause)");
+        super.onPause();
 		saveUserInfo();
 	}
 
 	@Override
 	public void onDestroy()
 	{
-		super.onDestroy();
+        Log.d(TAG, "Application détruite (onDestroy)");
+        super.onDestroy();
 		doUnbindService();
 	}
 
